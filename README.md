@@ -1,0 +1,1 @@
+# Simple vim and neovim configuration
