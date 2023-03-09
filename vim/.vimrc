@@ -12,11 +12,9 @@ call plug#begin('~/.vim/plugged')
   Plug 'wakatime/vim-wakatime' " Wakatime plugins
   Plug 'http://github.com/tpope/vim-surround' " Surrounding vim
   Plug 'vim-airline/vim-airline' " Status bar
-  Plug 'vim-airline/vim-airline-themes' " Airline theme 
-  Plug '~/local-plugin'
+  Plug 'vim-airline/vim-airline-themes' " Airline theme
 
 call plug#end()
-
 
 " Basic configuration
 set nocompatible " set vim compabilty
@@ -25,7 +23,6 @@ set encoding=utf-8 " encoding
 set number " show line numbers
 set laststatus=2 " status bar
 set shiftwidth=2 " indent
-
 
 " Enable colorscheme
 syntax on
@@ -54,8 +51,10 @@ let g:coc_global_extensions = [
   \ 'coc-html',
   \ 'coc-json',
   \ 'coc-python',
+  \ 'coc-pyright',
   \ 'coc-go',
-  \ '@yaegassy/coc-ansible'
+  \ '@yaegassy/coc-ansible',
+  \ 'coc-docker',
   \ ]
 
 " Nerdtree config
@@ -68,3 +67,4 @@ autocmd VimEnter * NERDTree
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 let g:NERDTreeDirArrowExpandable = '?'
 let g:NERDTreeDirArrowCollapsible = '?'
+
