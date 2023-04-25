@@ -13,6 +13,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'http://github.com/tpope/vim-surround' " Surrounding vim
   Plug 'vim-airline/vim-airline' " Status bar
   Plug 'vim-airline/vim-airline-themes' " Airline theme
+  Plug 'sansyrox/vim-python-virtualenv' "manage python virtualenv
 
 call plug#end()
 
@@ -67,4 +68,8 @@ autocmd VimEnter * NERDTree
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 let g:NERDTreeDirArrowExpandable = '?'
 let g:NERDTreeDirArrowCollapsible = '?'
+
+" Python virtualenv
+let g:python3_host_prog='/usr/bin/python3'
+
 
