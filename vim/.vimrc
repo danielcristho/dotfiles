@@ -5,8 +5,6 @@ call plug#begin('~/.vim/plugged')
   Plug 'https://github.com/preservim/nerdtree', { 'on': 'NERDTreeToggle' } " Directories hierarchies
   Plug 'https://github.com/ap/vim-css-color' " CSS Color Preview
   Plug 'https://github.com/tpope/vim-commentary' " For Commenting gcc & gc
-  Plug 'morhetz/gruvbox' " Install color scheme: gruvbox
-  Plug 'folke/tokyonight.nvim' " Install color scheme tokyonight
   Plug 'ryanoasis/vim-devicons'
   Plug 'vimsence/vimsence' " Discord presence
   Plug 'wakatime/vim-wakatime' " Wakatime plugins
@@ -14,7 +12,13 @@ call plug#begin('~/.vim/plugged')
   Plug 'vim-airline/vim-airline' " Status bar
   Plug 'vim-airline/vim-airline-themes' " Airline theme
   Plug 'sansyrox/vim-python-virtualenv' "manage python virtualenv
-
+  Plug 'pearofducks/ansible-vim' " Ansible Plugin
+  Plug 'kkvh/vim-docker-tools' " Docker Plugin
+  Plug 'valloric/youcompleteme' " Other Autocomplete
+  Plug 'sainnhe/gruvbox-material' " Install gruvbox-material colorscheme 
+  Plug 'morhetz/gruvbox' " Install gruvbox colorscheme
+  Plug 'folke/tokyonight.nvim' " Install tokyonight colorscheme
+  Plug 'nordtheme/vim' "Install nord colorscheme 
 call plug#end()
 
 " Basic configuration
@@ -27,8 +31,18 @@ set shiftwidth=2 " indent
 
 " Enable colorscheme
 syntax on
-colorscheme gruvbox
+colorscheme nord
 set background=dark
+
+" Returns true if the color hex value is light
+function! IsHexColorLight(color) abort
+  let l:raw_color = trim(a:color, '#')
+  let l:red = str2nr(substitute(l:raw_color, '(.{2}).{4}', '1', 'g'), 16)
+  let l:green = str2nr(substitute(l:raw_color, '.{2}(.{2}).{2}', '1', 'g'), 16)
+  let l:blue = str2nr(substitute(l:raw_color, '.{4}(.{2})', '1', 'g'), 16)
+  let l:brightness = ((l:red * 299) + (l:green * 587) + (l:blue * 114)) / 1000
+  return l:brightness > 155
+endfunction
 
 " Airline config
 let g:airline#extensions#tabline#enabled = 1
@@ -36,7 +50,7 @@ let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#formatter = 'jsformatter'
 
-"coc config
+" coc config
 let g:coc_global_extensions = [
   \ 'coc-snippets',
   \ 'coc-tsserver',
@@ -71,5 +85,4 @@ let g:NERDTreeDirArrowCollapsible = '?'
 
 " Python virtualenv
 let g:python3_host_prog='/usr/bin/python3'
-
 
