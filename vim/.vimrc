@@ -15,10 +15,10 @@ call plug#begin('~/.vim/plugged')
   Plug 'pearofducks/ansible-vim' " Ansible Plugin
   Plug 'kkvh/vim-docker-tools' " Docker Plugin
   Plug 'valloric/youcompleteme' " Other Autocomplete
-  Plug 'sainnhe/gruvbox-material' " Install gruvbox-material colorscheme 
+  Plug 'sainnhe/gruvbox-material' " Install gruvbox-material colorscheme
   Plug 'morhetz/gruvbox' " Install gruvbox colorscheme
   Plug 'folke/tokyonight.nvim' " Install tokyonight colorscheme
-  Plug 'nordtheme/vim' "Install nord colorscheme 
+  Plug 'nordtheme/vim' "Install nord colorscheme
 call plug#end()
 
 " Basic configuration
@@ -82,7 +82,4 @@ autocmd VimEnter * NERDTree
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 let g:NERDTreeDirArrowExpandable = '?'
 let g:NERDTreeDirArrowCollapsible = '?'
-
-" Python virtualenv
-let g:python3_host_prog='/usr/bin/python3'
 
