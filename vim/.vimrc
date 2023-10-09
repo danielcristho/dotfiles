@@ -15,23 +15,29 @@ call plug#begin('~/.vim/plugged')
   Plug 'pearofducks/ansible-vim' " Ansible Plugin
   Plug 'kkvh/vim-docker-tools' " Docker Plugin
   Plug 'valloric/youcompleteme' " Other Autocomplete
-  Plug 'sainnhe/gruvbox-material' " Install gruvbox-material colorscheme
+  Plug 'sainnhe/gruvbox-material' " Install gruvbox-material colorscheme 
   Plug 'morhetz/gruvbox' " Install gruvbox colorscheme
   Plug 'folke/tokyonight.nvim' " Install tokyonight colorscheme
-  Plug 'nordtheme/vim' "Install nord colorscheme
+  Plug 'nordtheme/vim' "Install nord colorscheme 
+  Plug 'dylanaraps/wal.vim' "Install wal colorscheme
+ 
 call plug#end()
 
 " Basic configuration
 set nocompatible " set vim compabilty
-set wrap " set auto wrapping
+set nowrap " set no auto wrapping
 set encoding=utf-8 " encoding
 set number " show line numbers
 set laststatus=2 " status bar
 set shiftwidth=2 " indent
+set tabstop=4 softtabstop=4 " 
+"set relativenumber " set relative number
+set noswapfile " set no swapfile
 
 " Enable colorscheme
 syntax on
 colorscheme nord
+"colorscheme wal
 set background=dark
 
 " Returns true if the color hex value is light
@@ -83,3 +89,5 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 let g:NERDTreeDirArrowExpandable = '?'
 let g:NERDTreeDirArrowCollapsible = '?'
 
+" Python virtualenv
+let g:python3_host_prog='/usr/bin/python3'
