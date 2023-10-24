@@ -1,7 +1,7 @@
 call plug#begin('~/.vim/plugged')
 
-  Plug 'neoclide/coc.nvim', {'branch': 'release'} "Autocomplete plugin. similar to VSCode
-  Plug 'https://github.com/gryf/pylint-vim' "Pylint plugins
+  Plug 'neoclide/coc.nvim', {'branch': 'release'} " Autocomplete plugin. similar to VSCode
+  Plug 'https://github.com/gryf/pylint-vim' " Pylint plugins
   Plug 'https://github.com/preservim/nerdtree', { 'on': 'NERDTreeToggle' } " Directories hierarchies
   Plug 'https://github.com/ap/vim-css-color' " CSS Color Preview
   Plug 'https://github.com/tpope/vim-commentary' " For Commenting gcc & gc
@@ -18,7 +18,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'sainnhe/gruvbox-material' " Install gruvbox-material colorscheme 
   Plug 'morhetz/gruvbox' " Install gruvbox colorscheme
   Plug 'folke/tokyonight.nvim' " Install tokyonight colorscheme
-  Plug 'nordtheme/vim' "Install nord colorscheme 
+  Plug 'nordtheme/vim' " Install nord colorscheme 
   Plug 'dylanaraps/wal.vim' "Install wal colorscheme
 
  
@@ -90,8 +90,16 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 let g:NERDTreeDirArrowExpandable = '?'
 let g:NERDTreeDirArrowCollapsible = '?'
 
-" Ansible highlighting
-au BufRead,BufNewFile */playbooks/*.yml set filetype=yaml.ansible
+" Ansible highlight
+augroup ansible_vim_fthosts
+  autocmd!
+  autocmd BufNewFile,BufRead hosts setfiletype yaml.ansible
+augroup END
+
+let g:ansible_extra_keywords_highlight = 1
+let g:ansible_unindent_after_newline = 1
+
+
 
 " Python virtualenv
 let g:python3_host_prog='/usr/bin/python3'
