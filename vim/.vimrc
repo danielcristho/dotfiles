@@ -20,6 +20,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'folke/tokyonight.nvim' " Install tokyonight colorscheme
   Plug 'nordtheme/vim' "Install nord colorscheme 
   Plug 'dylanaraps/wal.vim' "Install wal colorscheme
+
  
 call plug#end()
 
@@ -88,6 +89,9 @@ autocmd VimEnter * NERDTree
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 let g:NERDTreeDirArrowExpandable = '?'
 let g:NERDTreeDirArrowCollapsible = '?'
+
+" Ansible highlighting
+au BufRead,BufNewFile */playbooks/*.yml set filetype=yaml.ansible
 
 " Python virtualenv
 let g:python3_host_prog='/usr/bin/python3'
