@@ -103,14 +103,12 @@ test -r ~/.dir_colors && eval $(dircolors ~/.dir_colors)
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 #alias python="python3"
+
+
+# ADD SOME ALIAS #
 alias py="python3"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-
-# .NET Core
-#export PATH="$PATH:/Users/$USER/.dotnet/tools"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
 
 export PATH="/root/.local/bin:$PATH"
