@@ -12,6 +12,26 @@ success_symbol = '[➜](bold green)' # The 'success_symbol' segment is being set
 [package]
 disabled = true
 
+#[username]
+#style_user = "green bold"
+#style_root = "red bold"
+#format = "[$user]($style) "
+#disabled = false
+#show_always = false 
+
+#[hostname]
+#ssh_only = false
+#format = 'on [danielcristho](bold yellow) '
+#trim_at = "."
+#disabled = false
+
+# configure directory
+[directory]
+read_only = " "
+truncation_length = 10
+truncate_to_repo = true # truncates directory to root folder if in github repo
+style = "bold italic blue"
+
 # AWS config
 [aws]
 #format = "[\($profile\)](bold red)"
@@ -19,6 +39,7 @@ disabled = true
 #shell = [""]
 #trim_at = [" "]
 disabled = true
+symbol = "  "
 
 # Gcloud config 
 [gcloud]
@@ -29,4 +50,46 @@ disabled = true
 format = ""
 command = "sh -c \"echo ''\""
 disabled = true
+
+[git_branch]
+symbol = " "
+
+[conda]
+symbol = " "
+
+[golang]
+symbol = " "
+
+[hg_branch]
+symbol = " "
+
+[java]
+symbol = " " 
+
+[nodejs]
+format = "via [ Node.js $version](bold green) "
+detect_files = ["package.json", ".node-version"]
+detect_folders = ["node_modules"]
+
+[python]
+symbol = " "
+#pyenv_version_name = true
+format = 'via [${symbol}python (${version} )(\($virtualenv\) )]($style)'
+style = "bold yellow"
+pyenv_prefix = "venv "
+python_binary = ["./venv/bin/python", "python", "python3", "python2"]
+detect_extensions = ["py"]
+version_format = "v${raw}"
+
+[php]
+symbol = " "
+
+[docker_context]
+symbol = " "
+format = "via [$symbol$context]($style) "
+style = "blue bold"
+only_with_files = true
+detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
+detect_folders = []
+disabled = false
 
