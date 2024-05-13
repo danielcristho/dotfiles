@@ -2,14 +2,17 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-  export ZSH=~/.oh-my-zsh
+export ZSH=~/.oh-my-zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 #ZSH_THEME="pixegami-agnoster"
 ZSH_THEME="amuse"
-#ZSH_THEME="lambda-pure"
+#ZSH_THEME="dracula"
+#ZSH_THEME="awesomepanda"
+
+
 #ZSH_THEME="bira"
 
 #zplug "dracula/zsh", as:theme 
@@ -28,7 +31,7 @@ ZSH_THEME="amuse"
 # HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
+# DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
 # export UPDATE_ZSH_DAYS=13
@@ -69,6 +72,7 @@ plugins=(
 
 )
 
+#zplug "greymd/docker-zsh-completion"
 source $ZSH/oh-my-zsh.sh
 
 # Nord dircolor
@@ -106,8 +110,12 @@ test -r ~/.dir_colors && eval $(dircolors ~/.dir_colors)
 
 # Git Alias
 alias ga="git add"
-alias gc="git commit"
+alias gcm="git commit"
 alias gp="git push"
+alias gcl="git clone"
+alias gpl="git pull"
+alias gbr="git branch"
+alias gck="git checkout"
 
 # Python Alias 
 alias py="python3"
@@ -117,10 +125,36 @@ alias tx="tmux"
 alias txn="tmux new -s"
 alias txkl="tmux kill-session -t"
 
+# Docker Alias
+alias dcd="docker compose down"
+alias dcu="docker compose up --build -d"
+
+# System Alias
+alias pwf="poweroff"
+alias rbt="reboot"
+
+# Android Studio Alias
+alias studio="bash /usr/local/android-studio/bin/studio.sh"
+
+# Direcory Alias
+alias gt="cd ~/Desktop/Github"
+alias ppdb="cd ~/Documents/PPDB/24" 
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+
+# Import colorscheme from 'wal' asynchronously
+# &   # Run the process in the background.
+# ( ) # Hide shell job control messages.
+#(cat ~/.cache/wal/sequences &)
+
+# Alternative (blocks terminal for 0-3ms)
+#cat ~/.cache/wal/sequences
+
+# To add support for TTYs this line can be optionally added.
+#source ~/.cache/wal/colors-tty.sh
 
 # .NET Core
 #export PATH="$PATH:/Users/$USER/.dotnet/tools"
@@ -133,3 +167,16 @@ if [ -f '/home/danielpepuho/google-cloud-sdk/completion.zsh.inc' ]; then . '/hom
 
 
 export PATH="/root/.local/bin:$PATH"
+source /home/danielpepuho/Desktop/Github/alacritty/extra/completions/alacritty.bash
+
+# pnpm
+export PNPM_HOME="/home/danielpepuho/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# starship config
+eval "$(starship init zsh)"
+
