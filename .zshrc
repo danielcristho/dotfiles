@@ -15,7 +15,7 @@ ZSH_THEME="amuse"
 
 #ZSH_THEME="bira"
 
-#zplug "dracula/zsh", as:theme 
+#zplug "dracula/zsh", as:theme
 # Set list of themes to load
 # Setting this variable when ZSH_THEME=random
 # cause zsh load theme from this variable instead of
@@ -117,7 +117,7 @@ alias gpl="git pull"
 alias gbr="git branch"
 alias gck="git checkout"
 
-# Python Alias 
+# Python Alias
 alias py="python3"
 
 # Tmux Alias
@@ -133,18 +133,6 @@ alias dcu="docker compose up --build -d"
 alias pwf="poweroff"
 alias rbt="reboot"
 
-# Android Studio Alias
-alias studio="bash /usr/local/android-studio/bin/studio.sh"
-
-# Direcory Alias
-alias gt="cd ~/Desktop/Github"
-alias ppdb="cd ~/Documents/PPDB/24" 
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-
 # Import colorscheme from 'wal' asynchronously
 # &   # Run the process in the background.
 # ( ) # Hide shell job control messages.
@@ -155,27 +143,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # To add support for TTYs this line can be optionally added.
 #source ~/.cache/wal/colors-tty.sh
-
-# .NET Core
-#export PATH="$PATH:/Users/$USER/.dotnet/tools"
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/home/danielpepuho/google-cloud-sdk/path.zsh.inc' ]; then . '/home/danielpepuho/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/home/danielpepuho/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/danielpepuho/google-cloud-sdk/completion.zsh.inc'; fi
-
-
-export PATH="/root/.local/bin:$PATH"
-source /home/danielpepuho/Desktop/Github/alacritty/extra/completions/alacritty.bash
-
-# pnpm
-export PNPM_HOME="/home/danielpepuho/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
 
 # starship config
 eval "$(starship init zsh)"
