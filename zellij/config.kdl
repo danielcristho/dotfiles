@@ -7,7 +7,7 @@ keybinds {
     locked {
         bind "Ctrl g" { SwitchToMode "Normal"; }
     }
-    resize {	
+    resize {
         bind "Ctrl n" { SwitchToMode "Normal"; }
         bind "h" "Left" { Resize "Increase Left"; }
         bind "j" "Down" { Resize "Increase Down"; }
@@ -187,7 +187,7 @@ keybinds {
 
 plugins {
     tab-bar location="zellij:tab-bar"
-    status-bar location="zellij:status-bar"
+    //status-bar location="zellij:status-bar"
     strider location="zellij:strider"
     compact-bar location="zellij:compact-bar"
     session-manager location="zellij:session-manager"
@@ -276,11 +276,6 @@ A// Toggle between having Zellij lay out panes according to a predefined set of 
 //     }
 //}
 
-// Choose the theme that is specified in the themes section.
-// Default: default
-//
-theme "gruvbox-dark"
-
 // The name of the default layout to load on startup
 // Default: "default"
 //
@@ -343,14 +338,18 @@ theme "gruvbox-dark"
 // Default: false
 //
 // mirror_session true
-
 // The folder in which Zellij will look for layouts
 //
+
 // layout_dir "/path/to/my/layout_dir"
+// Choose the theme that is specified in the themes section.
+// Default: default
+//
+theme "gruvbox-dark"
 
 // The folder in which Zellij will look for themes
 //
-theme_dir "/home/danielpepuho/.config/zellij/themes"
+theme_dir "~/.config/zellij/themes"
 
 // Enable or disable the rendering of styled and colored underlines (undercurl).
 // May need to be disabled for certain unsupported terminals
