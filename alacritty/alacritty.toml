@@ -1,5 +1,5 @@
 import = [
-  "/home/danielpepuho/.config/alacritty/themes/themes/Gruvbox-Light.toml"
+  "~/.config/alacritty/themes/themes/Gruvbox-Light.toml"
 ]
 
 [shell]

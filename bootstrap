@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+if ! command -v vim >/dev/null 2>&1; then
+	echo "Installing Vim..."
+	sudo apt-get install vim -y
+fi
+if command -v vim >/dev/null 2>&1; then
+	echo "Vim is installed."
+else
+	echo "Vim is not installed."
+	echo "You want install it?"
+	sudo apt-get install vim -y
+fi
+
+if command -v tilix >/dev/null 2>&1; then
+	echo "Tilix is installed."
+else
+	echo "Tilix is not installed."
+fi
+
+if command -v cool-retro-term >/dev/null 2>&1; then
+	echo "Retro Terminal is installed."
+else
+	echo "Retro Terminal is not installed."
+fi

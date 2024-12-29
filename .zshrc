@@ -147,3 +147,6 @@ alias rbt="reboot"
 # starship config
 eval "$(starship init zsh)"
 
+# autostart zellij
+eval "$(zellij setup --generate-auto-start zsh)"
+
