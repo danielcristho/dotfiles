@@ -1,26 +1,35 @@
+let g:loaded_perl_provider = 0
+let g:loaded_ruby_provider = 0
+let g:loaded_node_provider = 0
+
 " =========================================================
 " Plugins
 " =========================================================
 call plug#begin('~/.vim/plugged')
 
+" Core
 Plug 'neoclide/coc.nvim', {'branch': 'release'}      " LSP / Autocomplete
-Plug 'gryf/pylint-vim'                               " Pylint
-Plug 'preservim/nerdtree'                            " File tree
-Plug 'ap/vim-css-color'                              " CSS color preview
-Plug 'tpope/vim-commentary'                          " gcc / gc comments
-Plug 'tpope/vim-surround'                            " cs, ds, ys
-Plug 'ryanoasis/vim-devicons'                        " Icons
-Plug 'vimsence/vimsence'                             " Discord presence
-Plug 'wakatime/vim-wakatime'                         " Wakatime
-Plug 'vim-airline/vim-airline'                       " Statusline
-Plug 'vim-airline/vim-airline-themes'                " Airline themes
-Plug 'pearofducks/ansible-vim'                       " Ansible
-Plug 'kkvh/vim-docker-tools'                         " Docker
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }   " Golang
+Plug 'tpope/vim-commentary'                          " gcc / gc
+Plug 'tpope/vim-surround'                            " cs ds ys
+Plug 'ryanoasis/vim-devicons'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'vimsence/vimsence'
+Plug 'wakatime/vim-wakatime'
+
+" File tree (lazy)
+Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
+
+" Language plugins (lazy by filetype)
+Plug 'gryf/pylint-vim',                { 'for': 'python' }
+Plug 'fatih/vim-go',                   { 'do': ':GoUpdateBinaries', 'for': 'go' }
+Plug 'pearofducks/ansible-vim',         { 'for': ['yaml', 'yaml.ansible'] }
+Plug 'kkvh/vim-docker-tools',           { 'for': 'dockerfile' }
+Plug 'ap/vim-css-color',                { 'for': ['css', 'html'] }
 
 " Colorschemes
-Plug 'sainnhe/gruvbox-material'
 Plug 'morhetz/gruvbox'
+Plug 'sainnhe/gruvbox-material'
 Plug 'folke/tokyonight.nvim'
 Plug 'nordtheme/vim'
 Plug 'dylanaraps/wal.vim'
@@ -33,18 +42,22 @@ call plug#end()
 " =========================================================
 set nocompatible
 syntax on
+filetype plugin indent on
+
 set number
 set nowrap
 set noswapfile
-set laststatus=2
 set mouse+=a
-set fileformat=unix
+set laststatus=2
 set encoding=utf-8
+set fileformat=unix
 set autowrite
-filetype plugin indent on
+set hidden
+
+let mapleader=" "
 
 " =========================================================
-" Python Indentation 
+" Python Indentation
 " =========================================================
 augroup python_indent
   autocmd!
@@ -52,7 +65,7 @@ augroup python_indent
 augroup END
 
 " =========================================================
-" Colors & UI
+" UI & Colors
 " =========================================================
 set termguicolors
 set background=dark
@@ -62,13 +75,6 @@ let g:gruvbox_italic = 1
 hi Normal guibg=NONE ctermbg=NONE
 highlight VertSplit ctermbg=NONE ctermfg=blue
 
-let g:terminal_ansi_colors = [
-\ '#282828', '#cc241d', '#98971a', '#d79921',
-\ '#458588', '#b16286', '#689d6a', '#a89984',
-\ '#928374', '#fb4934', '#b8bb26', '#fabd2f',
-\ '#83a598', '#d3869b', '#8ec07c', '#ebdbb2',
-\]
-
 " =========================================================
 " Airline
 " =========================================================
@@ -77,7 +83,7 @@ let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 
 " =========================================================
-" Coc.nvim
+" Coc.nvim Configuration
 " =========================================================
 let g:coc_global_extensions = [
 \ 'coc-snippets',
@@ -97,13 +103,41 @@ let g:coc_global_extensions = [
 \ ]
 
 " =========================================================
-" Emmet
+" Coc Completion
 " =========================================================
-let g:user_emmet_settings = {
-\ 'javascript': {
-\   'extends': 'jsx',
-\ },
-\}
+inoremap <silent><expr> <Tab>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+
+inoremap <expr><S-Tab>
+      \ coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+inoremap <silent><expr> <CR>
+      \ coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1] =~# '\s'
+endfunction
+
+" =========================================================
+" Coc Navigation & Actions
+" =========================================================
+nnoremap <silent> gd <Plug>(coc-definition)
+nnoremap <silent> gy <Plug>(coc-type-definition)
+nnoremap <silent> gi <Plug>(coc-implementation)
+nnoremap <silent> gr <Plug>(coc-references)
+
+nnoremap <silent> K :call CocActionAsync('doHover')<CR>
+nnoremap <leader>rn <Plug>(coc-rename)
+nnoremap <leader>ca <Plug>(coc-codeaction)
+xnoremap <leader>ca <Plug>(coc-codeaction-selected)
+nnoremap <leader>f  :call CocActionAsync('format')<CR>
+
+nnoremap <silent> [g <Plug>(coc-diagnostic-prev)
+nnoremap <silent> ]g <Plug>(coc-diagnostic-next)
+nnoremap <leader>e :CocDiagnostics<CR>
 
 " =========================================================
 " NERDTree
@@ -113,9 +147,6 @@ nnoremap <C-f> :NERDTreeFind<CR>
 
 autocmd VimEnter * if argc() == 0 | NERDTree | endif
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') | quit | endif
-
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
 
 " =========================================================
 " Ansible
