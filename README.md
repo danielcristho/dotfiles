@@ -145,7 +145,9 @@ Edit `zsh/.zshrc`
 
 ## Looks
 
-![NVIM](./assets/neovim.png)
+![NVIM 1](./assets/neovim1.png)
+
+![NVIM 2](./assets/neovim2.png)
 
 ![VIM](./assets/vim.png)
 
