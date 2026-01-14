@@ -112,7 +112,9 @@ fi
 e_header "Linking dotfiles..."
 
 # Alacritty
+# Use TOML config (v0.13+) and link theme file
 link_file "$DOTFILES_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
+link_file "$DOTFILES_DIR/alacritty/gruvbox-material-alacritty.yml" "$HOME/.config/alacritty/gruvbox-material-alacritty.yml"
 
 # Neovim
 link_file "$DOTFILES_DIR/neovim/.config/nvim" "$HOME/.config/nvim"

@@ -24,6 +24,7 @@ cd ~/dotfiles
 - Zellij (multiplexer)
 - Lazygit (git TUI)
 - Yazi (file manager)
+- Cool Retro Term & Tilix
 
 ### Tools
 
@@ -142,12 +143,13 @@ Edit `neovim/.config/nvim/lua/plugins/gruvbox.lua`
 
 Edit `zsh/.zshrc`
 
-## Requirements
+## Looks
 
-- Ubuntu 24.04 (or compatible)
-- Git
-- Curl
-- Sudo access
+![NVIM](./assets/neovim.png)
+
+![VIM](./assets/vim.png)
+
+![CRT](./assets/crt.png)
 
 ## Credits
 
