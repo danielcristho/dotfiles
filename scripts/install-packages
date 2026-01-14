@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+
+# Package installation script for Ubuntu 24.04
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+e_header() { echo -e "${BLUE}==>${NC} $1"; }
+e_success() { echo -e "${GREEN}✓${NC} $1"; }
+
+# Update system
+e_header "Updating system packages..."
+sudo apt update
+
+# Core packages
+e_header "Installing core packages..."
+sudo apt install -y \
+    build-essential \
+    curl \
+    wget \
+    git \
+    zsh \
+    stow \
+    unzip \
+    tar
+
+# Terminal & Shell
+e_header "Installing terminal tools..."
+sudo apt install -y \
+    alacritty \
+    tilix \
+    cool-retro-term \
+    tmux \
+    fzf \
+    ripgrep \
+    fd-find \
+    bat \
+    tree \
+    jq \
+    neofetch \
+    btop
+
+# Create fd symlink
+sudo ln -sf $(which fdfind) /usr/local/bin/fd 2>/dev/null || true
+
+# Starship prompt
+if ! command -v starship &> /dev/null; then
+    e_header "Installing Starship..."
+    curl -sS https://starship.rs/install.sh | sh -s -- -y
+    e_success "Starship installed"
+fi
+
+# Zellij
+if ! command -v zellij &> /dev/null; then
+    e_header "Installing Zellij..."
+    cargo install --locked zellij 2>/dev/null || {
+        # Fallback to binary release
+        ZELLIJ_VERSION=$(curl -s https://api.github.com/repos/zellij-org/zellij/releases/latest | grep -Po '"tag_name": "v\K[^"]*')
+        wget "https://github.com/zellij-org/zellij/releases/download/v${ZELLIJ_VERSION}/zellij-x86_64-unknown-linux-musl.tar.gz"
+        tar -xzf zellij-x86_64-unknown-linux-musl.tar.gz
+        sudo mv zellij /usr/local/bin/
+        rm zellij-x86_64-unknown-linux-musl.tar.gz
+    }
+    e_success "Zellij installed"
+fi
+
+# Rust (for cargo packages)
+if ! command -v cargo &> /dev/null; then
+    e_header "Installing Rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source "$HOME/.cargo/env"
+    e_success "Rust installed"
+fi
+
+# Cargo packages
+e_header "Installing Rust packages..."
+# cargo install --force yazi-build
+cargo install eza zoxide yazi-fm yazi-cli 2>/dev/null || true
+
+# Node.js & npm
+if ! command -v node &> /dev/null; then
+    e_header "Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt install -y nodejs
+    e_success "Node.js installed"
+fi
+
+# npm packages
+e_header "Installing npm packages..."
+npm install -g tree-sitter-cli pnpm
+
+# Lazygit
+if ! command -v lazygit &> /dev/null; then
+    e_header "Installing Lazygit..."
+    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+    tar xf lazygit.tar.gz lazygit
+    sudo install lazygit /usr/local/bin
+    rm lazygit lazygit.tar.gz
+    e_success "Lazygit installed"
+fi
+
+# Lazydocker
+if ! command -v lazydocker &> /dev/null; then
+    e_header "Installing Lazydocker..."
+    curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
+    e_success "Lazydocker installed"
+fi
+
+# Neovim
+if [ ! -f /opt/nvim-linux-x86_64/bin/nvim ]; then
+    e_header "Installing Neovim..."
+    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+    sudo rm -rf /opt/nvim-linux-x86_64
+    sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
+    rm nvim-linux-x86_64.tar.gz
+    sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim
+    e_success "Neovim installed"
+fi
+
+# Python packages
+e_header "Installing Python packages..."
+pip3 install --user pynvim greenlet
+
+# Oh My Zsh
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    e_header "Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    e_success "Oh My Zsh installed"
+fi
+
+# Zsh plugins
+if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+fi
+
+if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+fi
+
+# Nerd Fonts
+if ! fc-list | grep -q "CaskaydiaMono"; then
+    e_header "Installing Nerd Fonts..."
+    mkdir -p ~/.local/share/fonts
+    cd ~/.local/share/fonts
+    wget -q https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/CascadiaMono.zip
+    unzip -q CascadiaMono.zip
+    rm CascadiaMono.zip
+    fc-cache -fv
+    cd - > /dev/null
+    e_success "Nerd Fonts installed"
+fi
+
+echo ""
+e_success "All packages installed successfully!"

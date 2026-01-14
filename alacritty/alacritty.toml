@@ -1,0 +1,140 @@
+# =========================================================
+# Alacritty Configuration
+# =========================================================
+
+# Environment
+[env]
+TERM = "xterm-256color"
+
+# Shell
+[shell]
+program = "/usr/bin/zsh"
+args = ["--login"]
+
+# Window
+[window]
+startup_mode = "Windowed"
+dynamic_padding = true
+opacity = 0.80
+decorations = "Full"
+
+[window.padding]
+x = 10
+y = 10
+
+[window.dimensions]
+columns = 120
+lines = 30
+
+# Scrolling
+[scrolling]
+history = 10000
+multiplier = 3
+
+# Font
+[font]
+size = 14.0
+
+[font.normal]
+family = "CaskaydiaMono Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "CaskaydiaMono Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "CaskaydiaMono Nerd Font"
+style = "Italic"
+
+[font.bold_italic]
+family = "CaskaydiaMono Nerd Font"
+style = "Bold Italic"
+
+# Cursor
+[cursor]
+style = { shape = "Beam", blinking = "On" }
+blink_interval = 750
+unfocused_hollow = true
+
+# Colors (Gruvbox Dark)
+[colors.primary]
+background = "#282828"
+foreground = "#ebdbb2"
+
+[colors.normal]
+black = "#282828"
+red = "#cc241d"
+green = "#98971a"
+yellow = "#d79921"
+blue = "#458588"
+magenta = "#b16286"
+cyan = "#689d6a"
+white = "#a89984"
+
+[colors.bright]
+black = "#928374"
+red = "#fb4934"
+green = "#b8bb26"
+yellow = "#fabd2f"
+blue = "#83a598"
+magenta = "#d3869b"
+cyan = "#8ec07c"
+white = "#ebdbb2"
+
+[colors.cursor]
+text = "CellBackground"
+cursor = "CellForeground"
+
+[colors.selection]
+text = "CellBackground"
+background = "CellForeground"
+
+# Bell
+[bell]
+animation = "EaseOutExpo"
+duration = 0
+color = "#ffffff"
+
+# Mouse
+[mouse]
+hide_when_typing = true
+
+[[mouse.bindings]]
+mouse = "Middle"
+action = "PasteSelection"
+
+# Keyboard bindings
+[[keyboard.bindings]]
+key = "V"
+mods = "Control|Shift"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "F11"
+action = "ToggleFullscreen"
+
+[[keyboard.bindings]]
+key = "Plus"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Minus"
+mods = "Control"
+action = "DecreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Key0"
+mods = "Control"
+action = "ResetFontSize"
+
+[[keyboard.bindings]]
+key = "N"
+mods = "Control|Shift"
+action = "SpawnNewInstance"
