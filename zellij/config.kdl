@@ -348,8 +348,9 @@ A// Toggle between having Zellij lay out panes according to a predefined set of 
 theme "gruvbox-dark"
 
 // The folder in which Zellij will look for themes
+// Default: $HOME/.config/zellij/themes
 //
-theme_dir "~/.config/zellij/themes"
+// theme_dir "/path/to/themes"
 
 // Enable or disable the rendering of styled and colored underlines (undercurl).
 // May need to be disabled for certain unsupported terminals

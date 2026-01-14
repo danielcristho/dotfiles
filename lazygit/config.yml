@@ -1,0 +1,161 @@
+# Lazygit Configuration
+# Adapted from macOS dotfiles for Ubuntu 24.04
+
+git:
+  overrideGpg: true
+  autoForwardBranches: none
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+
+keybinding:
+  universal:
+    scrollUpMain-alt1: <c-k>
+    scrollDownMain-alt1: <c-j>
+    quit: q
+    quit-alt1: <c-c>
+    return: <esc>
+    quitWithoutChangingDirectory: Q
+    togglePanel: <tab>
+    prevItem: <up>
+    nextItem: <down>
+    prevItem-alt: k
+    nextItem-alt: j
+    prevPage: ','
+    nextPage: '.'
+    scrollLeft: H
+    scrollRight: L
+    gotoTop: <
+    gotoBottom: '>'
+    toggleRangeSelect: v
+    rangeSelectDown: <s-down>
+    rangeSelectUp: <s-up>
+    prevBlock: <left>
+    nextBlock: <right>
+    prevBlock-alt: h
+    nextBlock-alt: l
+    nextMatch: 'n'
+    prevMatch: 'N'
+    startSearch: /
+    optionMenu: <disabled>
+    optionMenu-alt1: '?'
+    select: <space>
+    goInto: <enter>
+    confirm: <enter>
+    remove: d
+    new: 'n'
+    edit: e
+    openFile: o
+    scrollUpMain: <pgup>
+    scrollDownMain: <pgdown>
+    scrollUpMain-alt2: <c-u>
+    scrollDownMain-alt2: <c-d>
+    executeCustomCommand: ':'
+    createRebaseOptionsMenu: m
+    pushFiles: P
+    pullFiles: p
+    refresh: R
+    createPatchOptionsMenu: <c-p>
+    nextTab: ']'
+    prevTab: '['
+    nextScreenMode: +
+    prevScreenMode: _
+    undo: z
+    redo: <c-z>
+    filteringMenu: <c-s>
+    diffingMenu: W
+    diffingMenu-alt: <c-e>
+    copyToClipboard: <c-o>
+    openRecentRepos: <c-r>
+    submitEditorText: <enter>
+    extrasMenu: '@'
+    toggleWhitespaceInDiffView: <c-w>
+    increaseContextInDiffView: '}'
+    decreaseContextInDiffView: '{'
+  
+  commits:
+    moveUpCommit: K
+    moveDownCommit: J
+    squashDown: s
+    renameCommit: r
+    renameCommitWithEditor: R
+    viewResetOptions: g
+    markCommitAsFixup: f
+    createFixupCommit: F
+    squashAboveCommits: S
+    moveDownCommit: <c-j>
+    moveUpCommit: <c-k>
+    amendToCommit: A
+    pickCommit: p
+    revertCommit: t
+    cherryPickCopy: c
+    cherryPickCopyRange: C
+    pasteCommits: v
+    tagCommit: T
+    checkoutCommit: <space>
+    resetCherryPick: <c-R>
+    copyCommitMessageToClipboard: <c-y>
+    openLogMenu: <c-l>
+    viewBisectOptions: b
+
+os:
+  editPreset: nvim
+  edit: nvim {{filename}}
+  editAtLine: nvim +{{line}} {{filename}}
+  editAtLineAndWait: nvim +{{line}} {{filename}}
+  open: xdg-open {{filename}}
+  openLink: xdg-open {{link}}
+
+gui:
+  useHunkModeInStagingView: false
+  border: 'single'
+  branchColors:
+    'master': red
+    'main': red
+    'develop': yellow
+    'staging': magenta
+
+  nerdFontsVersion: '3'
+  filterMode: fuzzy
+  
+  theme:
+    showDivergenceFromBaseBranch: arrowAndNumber
+    selectedLineBgColor:
+      - reverse
+    activeBorderColor:
+      - green
+      - bold
+    inactiveBorderColor:
+      - white
+    optionsTextColor:
+      - blue
+    selectedRangeBgColor:
+      - blue
+
+  commitLength:
+    show: true
+
+  mouseEvents: true
+  skipDiscardChangeWarning: false
+  skipStashWarning: false
+  showFileTree: true
+  showListFooter: true
+  showRandomTip: false
+  showBranchCommitHash: false
+  showBottomLine: true
+  showCommandLog: true
+  showIcons: true
+
+refresher:
+  refreshInterval: 10
+  fetchInterval: 60
+
+update:
+  method: never
+
+confirmOnQuit: false
+quitOnTopLevelReturn: false
+
+notARepository: 'prompt'
+
+promptToReturnFromSubprocess: true

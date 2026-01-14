@@ -1,0 +1,31 @@
+# Local Zsh Configuration Example
+# Copy this file to ~/.zshrc.local and customize for your personal setup
+# This file is ignored by git
+
+# Personal directory aliases
+# alias work="cd ~/work/projects"
+# alias personal="cd ~/personal/code"
+# alias blog="cd ~/blog"
+
+# SSH aliases
+# alias server="ssh user@server.com"
+# alias vps="ssh root@vps.example.com"
+
+# Custom environment variables
+# export MY_API_KEY="your-api-key"
+# export CUSTOM_PATH="/opt/custom/bin"
+
+# Python version override
+# alias py="python3.11"
+# alias python3="python3.11"
+
+# Custom functions
+# function mkcd() {
+#     mkdir -p "$1" && cd "$1"
+# }
+
+# Project-specific aliases
+# alias start-project="cd ~/project && docker compose up"
+
+# Additional PATH entries
+# export PATH="$HOME/custom/bin:$PATH"

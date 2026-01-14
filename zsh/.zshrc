@@ -1,114 +1,41 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# Zsh Configuration
+# Oh My Zsh based configuration for Ubuntu
 
-# Path to your oh-my-zsh installation.
+# Path to your oh-my-zsh installation
 export ZSH=~/.oh-my-zsh
 
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-#ZSH_THEME="pixegami-agnoster"
+# Theme
 ZSH_THEME="amuse"
-#ZSH_THEME="dracula"
-#ZSH_THEME="awesomepanda"
 
-
-#ZSH_THEME="bira"
-
-#zplug "dracula/zsh", as:theme
-# Set list of themes to load
-# Setting this variable when ZSH_THEME=random
-# cause zsh load theme from this variable instead of
-# looking in ~/.oh-my-zsh/themes/
-# An empty array have no effect
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-#CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
+# Enable command auto-correction
 ENABLE_CORRECTION="true"
 
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# History timestamp format
 HIST_STAMPS="mm/dd/yyyy"
 
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
+# Plugins
 plugins=(
   git
   zsh-syntax-highlighting
   zsh-autosuggestions
-
 )
 
-#zplug "greymd/docker-zsh-completion"
 source $ZSH/oh-my-zsh.sh
 
-# Nord dircolor
+# Nord dircolor (optional)
 test -r ~/.dir_colors && eval $(dircolors ~/.dir_colors)
 
-# User configuration
+# Language environment
+export LANG=en_US.UTF-8
 
-# export MANPATH="/usr/local/man:$MANPATH"
+# Editor
+export EDITOR='nvim'
+export VISUAL='nvim'
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+# Common Aliases
+alias cl="clear"
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-#alias python="python3"
-
-# Git Alias
+# Git Aliases
 alias ga="git add"
 alias gcm="git commit"
 alias gp="git push"
@@ -116,37 +43,75 @@ alias gcl="git clone"
 alias gpl="git pull"
 alias gbr="git branch"
 alias gck="git checkout"
+alias lg="lazygit"
 
-# Python Alias
+# Python Aliases
 alias py="python3"
 
-# Tmux Alias
+# Tmux Aliases
 alias tx="tmux"
 alias txn="tmux new -s"
 alias txkl="tmux kill-session -t"
 
-# Docker Alias
+# Docker Aliases
 alias dcd="docker compose down"
 alias dcu="docker compose up --build -d"
 
-# System Alias
+# System Aliases
 alias pwf="poweroff"
 alias rbt="reboot"
 
-# Import colorscheme from 'wal' asynchronously
-# &   # Run the process in the background.
-# ( ) # Hide shell job control messages.
-#(cat ~/.cache/wal/sequences &)
+# Directory Navigation
+alias dw="cd ~/Downloads"
+alias dc="cd ~/Documents"
 
-# Alternative (blocks terminal for 0-3ms)
-#cat ~/.cache/wal/sequences
+# Development Aliases
+alias cpp="g++"
+alias tf="terraform"
+alias y="yazi"
 
-# To add support for TTYs this line can be optionally added.
-#source ~/.cache/wal/colors-tty.sh
+# NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# starship config
+# Google Cloud SDK (optional)
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then 
+    . "$HOME/google-cloud-sdk/path.zsh.inc"
+fi
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then 
+    . "$HOME/google-cloud-sdk/completion.zsh.inc"
+fi
+
+# pnpm
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+# Pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+command -v pyenv >/dev/null && eval "$(pyenv init - zsh)"
+
+# Go
+export PATH=$PATH:$HOME/go/bin
+
+# Neovim
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+
+# Local bin
+export PATH="$HOME/.local/bin:$PATH"
+
+# Starship prompt
 eval "$(starship init zsh)"
 
-# autostart zellij
+# Zellij auto-start
 eval "$(zellij setup --generate-auto-start zsh)"
 
+# Zoxide (smart cd)
+eval "$(zoxide init zsh)"
+
+# Local customizations (not tracked in git)
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local

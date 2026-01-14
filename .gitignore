@@ -1,1 +1,24 @@
 .cfg
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# Local customizations (not tracked)
+**/.zshrc.local
+**/.gitconfig.local
+**/.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dotfiles backup
+.dotfiles-backup-*/
