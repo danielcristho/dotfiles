@@ -156,6 +156,7 @@ Edit `zsh/.zshrc`
 Inspired by:
 
 - [gonstoll/dotfiles](https://github.com/gonstoll/dotfiles)
+- [sainnhe/gruvbox-material-alacritty.yml](https://gist.github.com/sainnhe/ad5cbc4f05c4ced83f80e54d9a75d22f)
 
 ## License
 
