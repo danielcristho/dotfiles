@@ -117,7 +117,7 @@ args = ["--login"]
 program = "/usr/bin/zsh"
 
 [window]
-decorations = "full"
+decorations = "None"
 dynamic_padding = true
 opacity = 0.85
 startup_mode = "Windowed"
