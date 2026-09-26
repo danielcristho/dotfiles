@@ -1,0 +1,33 @@
+# URL prefixes the install scripts may download from.
+# Add an entry only after reviewing the source. Prefer the narrowest prefix
+# (a single repo, not all of github.com).
+
+# Starship
+https://starship.rs/install.sh
+
+# Rust
+https://sh.rustup.rs
+
+# Zellij
+https://api.github.com/repos/zellij-org/zellij/
+https://github.com/zellij-org/zellij/releases/download/
+
+# Node.js
+https://nodejs.org/dist/index.json
+https://deb.nodesource.com/setup_lts.x
+
+# Lazygit / Lazydocker
+https://api.github.com/repos/jesseduffield/lazygit/
+https://github.com/jesseduffield/lazygit/releases/
+https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh
+
+# Neovim
+https://github.com/neovim/neovim/releases/
+
+# Oh My Zsh and plugins
+https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+https://github.com/zsh-users/zsh-autosuggestions
+https://github.com/zsh-users/zsh-syntax-highlighting.git
+
+# Nerd Fonts
+https://github.com/ryanoasis/nerd-fonts/releases/download/

@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+# Pre-commit checks: large/binary archives, shell syntax, shellcheck,
+# secrets (gitleaks) and download source audit.
+# Skip once with: git commit --no-verify
+
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+MAX_SIZE_KB=5120
+
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+FAILED=0
+fail() { echo -e "${RED}✗${NC} $1"; FAILED=1; }
+warn() { echo -e "${YELLOW}!${NC} $1"; }
+
+mapfile -t STAGED < <(git diff --cached --name-only --diff-filter=ACMR)
+[ ${#STAGED[@]} -eq 0 ] && exit 0
+
+SHELL_FILES=()
+for file in "${STAGED[@]}"; do
+    [ -f "$ROOT/$file" ] || continue
+
+    # Downloaded archives/binaries do not belong in the repo
+    case "$file" in
+        *.tar|*.tar.gz|*.tgz|*.tar.xz|*.zip|*.deb|*.rpm|*.AppImage|*.tar.gz.[0-9]*)
+            fail "$file looks like a downloaded archive, don't commit it"
+            ;;
+    esac
+
+    size_kb=$(( $(git cat-file -s ":$file") / 1024 ))
+    if [ "$size_kb" -gt "$MAX_SIZE_KB" ]; then
+        fail "$file is ${size_kb}KB (limit ${MAX_SIZE_KB}KB)"
+    fi
+
+    if [[ "$file" == *.sh ]] || head -n1 "$ROOT/$file" | grep -qE '^#!.*\b(ba)?sh\b'; then
+        SHELL_FILES+=("$file")
+    fi
+done
+
+if [ ${#SHELL_FILES[@]} -gt 0 ]; then
+    for file in "${SHELL_FILES[@]}"; do
+        bash -n "$ROOT/$file" || fail "$file has a syntax error"
+    done
+
+    if command -v shellcheck &>/dev/null; then
+        (cd "$ROOT" && shellcheck -S warning "${SHELL_FILES[@]}") || fail "shellcheck found issues"
+    else
+        warn "shellcheck not installed, skipping lint (sudo apt install shellcheck)"
+    fi
+
+    "$ROOT/scripts/audit-sources" >/dev/null || {
+        "$ROOT/scripts/audit-sources" | grep -F '✗' || true
+        fail "download source audit failed (see scripts/audit-sources)"
+    }
+fi
+
+if command -v gitleaks &>/dev/null; then
+    gitleaks git --pre-commit --staged --redact --no-banner "$ROOT" >/dev/null 2>&1 \
+        || { gitleaks git --pre-commit --staged --redact --no-banner -v "$ROOT" || true; fail "gitleaks found possible secrets"; }
+else
+    warn "gitleaks not installed, skipping secret scan"
+fi
+
+if [ "$FAILED" -ne 0 ]; then
+    echo -e "${RED}Commit blocked.${NC} Fix the issues above or use --no-verify to skip."
+    exit 1
+fi
+echo -e "${GREEN}✓${NC} pre-commit checks passed"

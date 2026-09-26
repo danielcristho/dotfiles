@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+
+# Audit where the install scripts download and execute code from.
+#
+# Every URL in a tracked shell script must match a prefix in
+# .github/security/allowed-sources.txt, and every script piped into a shell
+# (curl ... | sh) must be listed in .github/security/allowed-remote-scripts.txt.
+# A new package source therefore fails until it is reviewed and allowlisted.
+#
+# Usage: audit-sources [--diff BASE_REF]
+#   --diff BASE_REF  Also list package installs added since BASE_REF
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ALLOWED_SOURCES="$ROOT/.github/security/allowed-sources.txt"
+ALLOWED_REMOTE="$ROOT/.github/security/allowed-remote-scripts.txt"
+SELF="scripts/audit-sources"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+ERRORS=0
+WARNINGS=0
+
+fail() { echo -e "${RED}✗${NC} $1"; ERRORS=$((ERRORS + 1)); }
+warn() { echo -e "${YELLOW}!${NC} $1"; WARNINGS=$((WARNINGS + 1)); }
+e_header() { echo -e "${BLUE}==>${NC} $1"; }
+
+# Read an allowlist, dropping comments and blank lines
+read_list() {
+    grep -vE '^\s*(#|$)' "$1" | sed 's/\s*$//'
+}
+
+# Tracked files with a sh/bash shebang
+shell_scripts() {
+    cd "$ROOT"
+    git ls-files | while read -r file; do
+        [ "$file" = "$SELF" ] && continue
+        [ -f "$file" ] || continue
+        if head -n1 "$file" | grep -qE '^#!.*\b(ba)?sh\b'; then
+            echo "$file"
+        fi
+    done
+}
+
+matches_prefix() {
+    local url="$1" prefix
+    while read -r prefix; do
+        [[ "$url" == "$prefix"* ]] && return 0
+    done < <(read_list "$ALLOWED_SOURCES")
+    return 1
+}
+
+BASE_REF=""
+if [ "${1:-}" = "--diff" ]; then
+    BASE_REF="${2:?--diff needs a base ref}"
+fi
+
+mapfile -t SCRIPTS < <(shell_scripts)
+mapfile -t REMOTE_OK < <(read_list "$ALLOWED_REMOTE")
+
+e_header "Auditing download sources in ${#SCRIPTS[@]} scripts"
+
+for file in "${SCRIPTS[@]}"; do
+    lineno=0
+    while IFS= read -r line; do
+        lineno=$((lineno + 1))
+        # Skip comments and lines that only echo instructions
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ "$line" =~ ^[[:space:]]*echo[[:space:]] ]] && continue
+
+        while read -r url; do
+            [ -z "$url" ] && continue
+            loc="$file:$lineno"
+            if [[ "$url" == http://* ]]; then
+                fail "$loc insecure http:// URL: $url"
+            elif ! matches_prefix "$url"; then
+                fail "$loc unreviewed source: $url (add to .github/security/allowed-sources.txt after review)"
+            fi
+            if [[ "$url" == */latest/* || "$url" == */releases/latest ]]; then
+                warn "$loc downloads an unpinned 'latest' release: $url"
+            fi
+        done < <(grep -oE 'https?://[^"'"'"' )|]+' <<< "$line" || true)
+
+        # Remote code piped straight into a shell
+        if grep -qE '(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+(-E[[:space:]]+)?)?(ba|z)?sh\b|sh -c "\$\((curl|wget)' <<< "$line"; then
+            url=$(grep -oE 'https://[^"'"'"' )|]+' <<< "$line" | head -1)
+            if ! printf '%s\n' "${REMOTE_OK[@]}" | grep -qxF "$url"; then
+                fail "$file:$lineno pipes a remote script into a shell: ${url:-<unknown>} (add to .github/security/allowed-remote-scripts.txt after review)"
+            fi
+        fi
+    done < "$ROOT/$file"
+done
+
+# Allowlisted remote scripts that are no longer used should be removed
+for url in "${REMOTE_OK[@]}"; do
+    if ! (cd "$ROOT" && grep -qF "$url" "${SCRIPTS[@]}"); then
+        warn "allowed-remote-scripts.txt entry no longer used: $url"
+    fi
+done
+
+# Summarise package installs added since BASE_REF so reviewers can check them
+if [ -n "$BASE_REF" ]; then
+    e_header "Package installs added since $BASE_REF"
+    added=$(cd "$ROOT" && git diff -U0 "$BASE_REF" -- "${SCRIPTS[@]}" \
+        | grep -E '^\+[^+]' \
+        | grep -E 'apt_install|apt(-get)? install|cargo install|npm install|pip3? install|pipx install|git clone|curl|wget|for crate in' \
+        || true)
+    if [ -n "$added" ]; then
+        echo "$added"
+        if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+            {
+                echo "### Package installs added in this change"
+                echo ""
+                echo "Review each new package and source before merging."
+                echo ""
+                echo '```diff'
+                echo "$added"
+                echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+        fi
+    else
+        echo "None"
+    fi
+fi
+
+echo ""
+if [ "$ERRORS" -gt 0 ]; then
+    echo -e "${RED}✗${NC} $ERRORS problem(s), $WARNINGS warning(s)"
+    exit 1
+fi
+echo -e "${GREEN}✓${NC} All download sources reviewed ($WARNINGS warning(s))"

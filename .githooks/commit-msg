@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# Enforce Conventional Commits: type(scope)!: description
+
+MSG_FILE="$1"
+FIRST_LINE=$(head -n1 "$MSG_FILE")
+
+# Allow git-generated messages
+if [[ "$FIRST_LINE" =~ ^(Merge|Revert|fixup!|squash!|amend!) ]]; then
+    exit 0
+fi
+
+TYPES="feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|security|adjust|release|wip|temp"
+if ! [[ "$FIRST_LINE" =~ ^($TYPES)(\([a-z0-9._/-]+\))?!?:\ .+ ]]; then
+    echo -e "\033[0;31m✗\033[0m Commit message must follow Conventional Commits:"
+    echo ""
+    echo "    <type>(<scope>): <description>"
+    echo ""
+    echo "  types: ${TYPES//|/, }"
+    echo "  e.g.   fix(packages): install zellij in a temp dir"
+    echo ""
+    echo "  got:   $FIRST_LINE"
+    exit 1
+fi
+
+if [ ${#FIRST_LINE} -gt 100 ]; then
+    echo -e "\033[0;31m✗\033[0m Commit subject is ${#FIRST_LINE} chars, keep it under 100"
+    exit 1
+fi

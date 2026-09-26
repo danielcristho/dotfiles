@@ -1,0 +1,8 @@
+# Remote scripts the install scripts pipe straight into a shell.
+# These run with your privileges (some with sudo), so each one must be
+# reviewed before it is added here.
+https://starship.rs/install.sh
+https://sh.rustup.rs
+https://deb.nodesource.com/setup_lts.x
+https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh
+https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
