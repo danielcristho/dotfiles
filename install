@@ -45,6 +45,11 @@ link_file() {
     local src="$1"
     local dest="$2"
     local dest_dir=$(dirname "$dest")
+
+    if [ ! -e "$src" ]; then
+        e_warning "Skipping $(basename "$src") (not found in dotfiles)"
+        return 0
+    fi
     
     mkdir -p "$dest_dir"
     
@@ -56,34 +61,201 @@ link_file() {
     e_success "Linked $(basename $src)"
 }
 
+# Link a component's config; skip silently if its source files are missing
+link_config() {
+    case "$1" in
+        alacritty)
+            link_file "$DOTFILES_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
+            ;;
+        neovim)
+            link_file "$DOTFILES_DIR/neovim/.config/nvim" "$HOME/.config/nvim"
+            ;;
+        zsh)
+            link_file "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+            ;;
+        starship)
+            link_file "$DOTFILES_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+            ;;
+        zellij)
+            link_file "$DOTFILES_DIR/zellij/config.kdl" "$HOME/.config/zellij/config.kdl"
+            if [ -d "$DOTFILES_DIR/zellij/themes" ]; then
+                link_file "$DOTFILES_DIR/zellij/themes" "$HOME/.config/zellij/themes"
+            fi
+            ;;
+        vim)
+            link_file "$DOTFILES_DIR/vim/.vimrc" "$HOME/.vimrc"
+            ;;
+        git)
+            link_file "$DOTFILES_DIR/git/git-lazypush" "$HOME/.local/bin/git-lazypush"
+            chmod +x "$HOME/.local/bin/git-lazypush"
+            ;;
+        lazygit)
+            link_file "$DOTFILES_DIR/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
+            ;;
+        yazi)
+            link_file "$DOTFILES_DIR/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
+            link_file "$DOTFILES_DIR/yazi/theme.toml" "$HOME/.config/yazi/theme.toml"
+            ;;
+        zed)
+            link_file "$DOTFILES_DIR/zed/settings.json" "$HOME/.config/zed/settings.json"
+            ;;
+        tilix)
+            mkdir -p "$HOME/.config/tilix/schemes"
+            for scheme in "$DOTFILES_DIR/tilix/color-scheme"/*.json; do
+                [ -f "$scheme" ] && link_file "$scheme" "$HOME/.config/tilix/schemes/$(basename "$scheme")"
+            done
+            ;;
+        cool-retro-term)
+            mkdir -p "$HOME/.config/cool-retro-term"
+            for profile in "$DOTFILES_DIR/cool-retro-terminal"/*.json; do
+                [ -f "$profile" ] && link_file "$profile" "$HOME/.config/cool-retro-term/$(basename "$profile")"
+            done
+            ;;
+    esac
+}
+
+ALL_CONFIGS=(alacritty neovim zsh starship zellij vim git lazygit yazi zed tilix cool-retro-term)
+
 # Parse arguments
-NO_PACKAGES=false
-NO_SYNC=false
+DO_SYNC=true
+DO_PACKAGES=true
+DO_LINK=true
+DO_POST=true
+USE_TUI=true
 
 for arg in "$@"; do
     case $arg in
-        --no-packages) NO_PACKAGES=true ;;
-        --no-sync) NO_SYNC=true ;;
+        --no-packages) DO_PACKAGES=false ;;
+        --no-sync) DO_SYNC=false ;;
+        --no-tui|-y|--yes) USE_TUI=false ;;
         --help)
             echo "Usage: ./install [OPTIONS]"
             echo ""
             echo "Options:"
             echo "  --no-packages    Skip package installation"
             echo "  --no-sync        Skip git sync"
+            echo "  -y, --yes        Non-interactive, install everything (no TUI)"
+            echo "  --no-tui         Same as --yes"
             echo "  --help           Show this help message"
             exit 0
+            ;;
+        *)
+            e_error "Unknown option: $arg (see --help)"
+            exit 1
             ;;
     esac
 done
 
-clear
+# TUI needs whiptail and an interactive terminal
+if ! command_exists whiptail || [ ! -t 0 ] || [ ! -t 1 ]; then
+    USE_TUI=false
+fi
+
+# Detect Ubuntu release
+SUPPORTED_VERSIONS=(24.04 26.04)
+OS_NAME="unknown"
+OS_VERSION="unknown"
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS_NAME="${NAME:-unknown}"
+    OS_VERSION="${VERSION_ID:-unknown}"
+fi
+
+OS_SUPPORTED=false
+if [ "$OS_NAME" = "Ubuntu" ]; then
+    for v in "${SUPPORTED_VERSIONS[@]}"; do
+        [ "$OS_VERSION" = "$v" ] && OS_SUPPORTED=true
+    done
+fi
+
+TITLE="Dotfiles Installation for $OS_NAME $OS_VERSION"
+SUPPORTED_LABEL="Ubuntu $(printf '%s / ' "${SUPPORTED_VERSIONS[@]}")"
+SUPPORTED_LABEL="${SUPPORTED_LABEL% / }"
+
+PACKAGE_GROUPS=($(bash "$DOTFILES_DIR/scripts/install-packages" --list))
+SELECTED_PACKAGES=("${PACKAGE_GROUPS[@]}")
+SELECTED_CONFIGS=("${ALL_CONFIGS[@]}")
+
+tui_cancel() {
+    clear 2>/dev/null || true
+    e_warning "Installation cancelled"
+    exit 1
+}
+
+# Show a whiptail checklist with every item pre-selected, print chosen items
+tui_checklist() {
+    local title="$1" text="$2"
+    shift 2
+    local items=()
+    for item in "$@"; do
+        items+=("$item" "" ON)
+    done
+    whiptail --title "$title" --backtitle "$TITLE" --separate-output \
+        --checklist "$text" 20 60 12 "${items[@]}" 3>&1 1>&2 2>&3
+}
+
+if [ "$USE_TUI" = true ]; then
+    if [ "$OS_SUPPORTED" = true ]; then
+        whiptail --title "Welcome" --backtitle "$TITLE" --yesno \
+            "Detected: $OS_NAME $OS_VERSION\n\nThis will set up your dotfiles.\nYou can choose what to install in the next steps.\n\nContinue?" 13 60 \
+            || tui_cancel
+    else
+        whiptail --title "Unsupported system" --backtitle "$TITLE" --defaultno --yesno \
+            "Detected: $OS_NAME $OS_VERSION\n\nThis script is designed for $SUPPORTED_LABEL.\nSome packages may be missing or fail.\n\nContinue anyway?" 13 60 \
+            || tui_cancel
+    fi
+
+    # Steps
+    STEP_ITEMS=()
+    [ "$DO_SYNC" = true ] && STEP_ITEMS+=(sync "Pull latest dotfiles from git" ON)
+    [ "$DO_PACKAGES" = true ] && STEP_ITEMS+=(packages "Install packages & tools" ON)
+    STEP_ITEMS+=(link "Symlink config files" ON)
+    STEP_ITEMS+=(post "Post-install (nvim plugins, zoxide, fzf)" ON)
+
+    STEPS=$(whiptail --title "Steps" --backtitle "$TITLE" --separate-output \
+        --checklist "Select steps to run (Space to toggle, Enter to confirm):" \
+        16 70 6 "${STEP_ITEMS[@]}" 3>&1 1>&2 2>&3) || tui_cancel
+
+    DO_SYNC=false; DO_PACKAGES=false; DO_LINK=false; DO_POST=false
+    while read -r step; do
+        case $step in
+            sync) DO_SYNC=true ;;
+            packages) DO_PACKAGES=true ;;
+            link) DO_LINK=true ;;
+            post) DO_POST=true ;;
+        esac
+    done <<< "$STEPS"
+
+    if [ "$DO_PACKAGES" = true ]; then
+        CHOICE=$(tui_checklist "Packages" "Select package groups to install:" "${PACKAGE_GROUPS[@]}") || tui_cancel
+        mapfile -t SELECTED_PACKAGES <<< "$CHOICE"
+        [ -z "$CHOICE" ] && DO_PACKAGES=false
+    fi
+
+    if [ "$DO_LINK" = true ]; then
+        CHOICE=$(tui_checklist "Configs" "Select configs to link:" "${ALL_CONFIGS[@]}") || tui_cancel
+        mapfile -t SELECTED_CONFIGS <<< "$CHOICE"
+        [ -z "$CHOICE" ] && DO_LINK=false
+    fi
+
+    SUMMARY="Sync repository : $DO_SYNC\n"
+    SUMMARY+="Install packages: $DO_PACKAGES\n"
+    [ "$DO_PACKAGES" = true ] && SUMMARY+="  ${SELECTED_PACKAGES[*]}\n"
+    SUMMARY+="Link configs    : $DO_LINK\n"
+    [ "$DO_LINK" = true ] && SUMMARY+="  ${SELECTED_CONFIGS[*]}\n"
+    SUMMARY+="Post-install    : $DO_POST\n"
+
+    whiptail --title "Confirm" --backtitle "$TITLE" --yesno \
+        "$SUMMARY\nProceed with installation?" 18 70 || tui_cancel
+fi
+
+clear 2>/dev/null || true
 echo ""
-e_header "Dotfiles Installation for Ubuntu 24.04"
+e_header "$TITLE"
 echo ""
 
-# Check if running on Ubuntu
-if [ ! -f /etc/os-release ] || ! grep -q "Ubuntu" /etc/os-release; then
-    e_warning "This script is designed for Ubuntu 24.04"
+if [ "$USE_TUI" = false ] && [ "$OS_SUPPORTED" = false ]; then
+    e_warning "This script is designed for $SUPPORTED_LABEL (detected: $OS_NAME $OS_VERSION)"
     read -p "Continue anyway? (y/N) " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -94,7 +266,7 @@ fi
 cd "$DOTFILES_DIR"
 
 # Git sync
-if [ "$NO_SYNC" = false ]; then
+if [ "$DO_SYNC" = true ]; then
     if [ -d .git ]; then
         e_header "Syncing dotfiles repository..."
         git pull --rebase origin main 2>/dev/null || git pull --rebase origin master 2>/dev/null || true
@@ -103,105 +275,51 @@ if [ "$NO_SYNC" = false ]; then
 fi
 
 # Install packages
-if [ "$NO_PACKAGES" = false ]; then
+if [ "$DO_PACKAGES" = true ]; then
     e_header "Installing packages..."
-    bash "$DOTFILES_DIR/scripts/install-packages"
+    bash "$DOTFILES_DIR/scripts/install-packages" "${SELECTED_PACKAGES[@]}"
 fi
 
 # Link dotfiles
-e_header "Linking dotfiles..."
-
-# Alacritty
-# Use TOML config (v0.13+) and link theme file
-link_file "$DOTFILES_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
-link_file "$DOTFILES_DIR/alacritty/gruvbox-material-alacritty.yml" "$HOME/.config/alacritty/gruvbox-material-alacritty.yml"
-
-# Neovim
-link_file "$DOTFILES_DIR/neovim/.config/nvim" "$HOME/.config/nvim"
-
-# Zsh
-link_file "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
-
-# Starship
-link_file "$DOTFILES_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
-
-# Zellij
-link_file "$DOTFILES_DIR/zellij/config.kdl" "$HOME/.config/zellij/config.kdl"
-if [ -d "$DOTFILES_DIR/zellij/themes" ]; then
-    link_file "$DOTFILES_DIR/zellij/themes" "$HOME/.config/zellij/themes"
-fi
-
-# Vim
-link_file "$DOTFILES_DIR/vim/.vimrc" "$HOME/.vimrc"
-
-# Git
-link_file "$DOTFILES_DIR/git/git-lazypush" "$HOME/.local/bin/git-lazypush"
-chmod +x "$HOME/.local/bin/git-lazypush"
-
-# Lazygit
-link_file "$DOTFILES_DIR/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
-
-# Yazi
-link_file "$DOTFILES_DIR/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
-link_file "$DOTFILES_DIR/yazi/theme.toml" "$HOME/.config/yazi/theme.toml"
-
-# Zed
-link_file "$DOTFILES_DIR/zed/settings.json" "$HOME/.config/zed/settings.json"
-
-# Tilix color schemes
-if command_exists tilix; then
-    e_header "Installing Tilix color schemes..."
-    mkdir -p "$HOME/.config/tilix/schemes"
-    for scheme in "$DOTFILES_DIR/tilix/color-scheme"/*.json; do
-        if [ -f "$scheme" ]; then
-            link_file "$scheme" "$HOME/.config/tilix/schemes/$(basename $scheme)"
-        fi
+if [ "$DO_LINK" = true ]; then
+    e_header "Linking dotfiles..."
+    for config in "${SELECTED_CONFIGS[@]}"; do
+        link_config "$config"
     done
-    e_success "Tilix color schemes installed"
+    echo ""
+    e_success "Dotfiles linked successfully!"
 fi
-
-# Cool Retro Term
-if command_exists cool-retro-term; then
-    e_header "Installing Cool Retro Term profiles..."
-    mkdir -p "$HOME/.config/cool-retro-term"
-    for profile in "$DOTFILES_DIR/cool-retro-terminal"/*.json; do
-        if [ -f "$profile" ]; then
-            link_file "$profile" "$HOME/.config/cool-retro-term/$(basename $profile)"
-        fi
-    done
-    e_success "Cool Retro Term profiles installed"
-fi
-
-echo ""
-e_success "Dotfiles linked successfully!"
 
 # Post-install setup
-e_header "Running post-install setup..."
+if [ "$DO_POST" = true ]; then
+    e_header "Running post-install setup..."
 
-# Install Neovim plugins
-if command_exists nvim; then
-    e_header "Installing Neovim plugins..."
-    nvim --headless "+PlugInstall" "+qall" 2>/dev/null || true
-    e_success "Neovim plugins installed"
-fi
-
-# Setup zoxide
-if command_exists zoxide; then
-    if ! grep -q "zoxide init" "$HOME/.zshrc"; then
-        echo 'eval "$(zoxide init zsh)"' >> "$HOME/.zshrc"
-        e_success "Zoxide initialized"
+    # Install Neovim plugins
+    if command_exists nvim; then
+        e_header "Installing Neovim plugins..."
+        nvim --headless "+PlugInstall" "+qall" 2>/dev/null || true
+        e_success "Neovim plugins installed"
     fi
-fi
 
-# Setup fzf
-if command_exists fzf; then
-    if [ ! -f "$HOME/.fzf.zsh" ]; then
-        if [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
-            # Ubuntu/Debian location
-            ln -sf /usr/share/doc/fzf/examples/key-bindings.zsh "$HOME/.fzf.zsh"
-            e_success "FZF configured"
+    # Setup zoxide
+    if command_exists zoxide; then
+        if ! grep -q "zoxide init" "$HOME/.zshrc"; then
+            echo 'eval "$(zoxide init zsh)"' >> "$HOME/.zshrc"
+            e_success "Zoxide initialized"
         fi
     fi
+
+    # Setup fzf
+    if command_exists fzf; then
+        if [ ! -f "$HOME/.fzf.zsh" ]; then
+            if [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
+                # Ubuntu/Debian location
+                ln -sf /usr/share/doc/fzf/examples/key-bindings.zsh "$HOME/.fzf.zsh"
+                e_success "FZF configured"
+            fi
+        fi
+    fi
+
 fi
 
 echo ""
