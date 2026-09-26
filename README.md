@@ -160,6 +160,36 @@ Edit `neovim/.config/nvim/lua/plugins/gruvbox.lua`
 
 Edit `zsh/.zshrc`
 
+## Development
+
+### Git Hooks
+
+Enable the repo hooks once after cloning:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+- `pre-commit`: blocks downloaded archives and large files, checks shell syntax, runs ShellCheck, audits download sources and scans for secrets with gitleaks
+- `commit-msg`: enforces [Conventional Commits](https://www.conventionalcommits.org) (`feat(install): ...`, `fix: ...`)
+
+ShellCheck and gitleaks are optional locally (the hook skips them with a warning if missing), but they always run in CI.
+
+### Adding a Package Source
+
+The install scripts may only download from reviewed sources. When you add a package that downloads from a new URL:
+
+1. Review the source (who maintains it, is it the official release?)
+2. Add its narrowest URL prefix to `.github/security/allowed-sources.txt`
+3. If it is piped into a shell (`curl ... | sh`), also add the exact URL to `.github/security/allowed-remote-scripts.txt`
+
+Run `scripts/audit-sources` to check locally.
+
+### CI
+
+- **CI**: ShellCheck, syntax check, and installer tests on Ubuntu 24.04 and 26.04
+- **Security**: gitleaks secret scan, download source audit (lists packages added in a PR), and zizmor audit of the workflows. Also runs weekly.
+
 ## Looks
 
 ![NVIM 1](./assets/neovim1.png)
