@@ -44,7 +44,8 @@ backup_file() {
 link_file() {
     local src="$1"
     local dest="$2"
-    local dest_dir=$(dirname "$dest")
+    local dest_dir
+    dest_dir=$(dirname "$dest")
 
     if [ ! -e "$src" ]; then
         e_warning "Skipping $(basename "$src") (not found in dotfiles)"
@@ -172,7 +173,7 @@ TITLE="Dotfiles Installation for $OS_NAME $OS_VERSION"
 SUPPORTED_LABEL="Ubuntu $(printf '%s / ' "${SUPPORTED_VERSIONS[@]}")"
 SUPPORTED_LABEL="${SUPPORTED_LABEL% / }"
 
-PACKAGE_GROUPS=($(bash "$DOTFILES_DIR/scripts/install-packages" --list))
+mapfile -t PACKAGE_GROUPS < <(bash "$DOTFILES_DIR/scripts/install-packages" --list)
 SELECTED_PACKAGES=("${PACKAGE_GROUPS[@]}")
 SELECTED_CONFIGS=("${ALL_CONFIGS[@]}")
 
