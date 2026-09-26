@@ -1,4 +1,4 @@
-# Dotfiles for Ubuntu 24.04
+# Dotfiles for Ubuntu 24.04 / 26.04
 
 Personal configuration files for Linux development environment.
 
@@ -45,8 +45,11 @@ cd ~/dotfiles
 ## Installation Options
 
 ```bash
-# Full installation
+# Interactive installation (TUI, choose steps/packages/configs)
 ./install
+
+# Non-interactive, install everything
+./install --yes
 
 # Skip package installation
 ./install --no-packages
@@ -58,12 +61,26 @@ cd ~/dotfiles
 ./install --help
 ```
 
+### Installer TUI
+
+The installer detects your Ubuntu version and lets you pick what to run.
+
+![Installer welcome](./assets/install-tui-welcome.png)
+
+![Installer steps](./assets/install-tui-steps.png)
+
+![Installer packages](./assets/install-tui-packages.png)
+
 ## Manual Installation
 
 ### 1. Install Packages
 
 ```bash
-./scripts/install-packages.sh
+# All groups
+./scripts/install-packages
+
+# Only selected groups (see --list)
+./scripts/install-packages core neovim zellij
 ```
 
 ### 2. Link Dotfiles
@@ -154,8 +171,6 @@ Edit `zsh/.zshrc`
 ![CRT](./assets/crt.png)
 
 ## Credits
-
-Inspired by:
 
 - [gonstoll/dotfiles](https://github.com/gonstoll/dotfiles)
 - [sainnhe/gruvbox-material-alacritty.yml](https://gist.github.com/sainnhe/ad5cbc4f05c4ced83f80e54d9a75d22f)
