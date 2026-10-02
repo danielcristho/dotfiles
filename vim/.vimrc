@@ -5,6 +5,12 @@ let g:loaded_node_provider = 0
 " =========================================================
 " Plugins
 " =========================================================
+" Install vim-plug and the plugins below on first launch
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent execute '!curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 call plug#begin('~/.vim/plugged')
 
 " Core
@@ -50,7 +56,7 @@ set noswapfile
 set mouse+=a
 set laststatus=2
 set encoding=utf-8
-set fileformat=unix
+set fileformats=unix,dos
 set autowrite
 set hidden
 
